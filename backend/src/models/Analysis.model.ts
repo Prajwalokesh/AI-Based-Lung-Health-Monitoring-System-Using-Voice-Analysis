@@ -12,19 +12,6 @@ const analysisSchema = new mongoose.Schema<AnalysisDocument, AnalysisModel>(
       ref: "AudioFile",
       required: true,
     },
-    age: {
-      type: Number,
-      required: true,
-    },
-    gender: {
-      type: String,
-      required: true,
-      enum: ["male", "female", "other"],
-    },
-    name: {
-      type: String,
-      required: false,
-    },
     result: {
       type: String,
       default: "Default Result!",

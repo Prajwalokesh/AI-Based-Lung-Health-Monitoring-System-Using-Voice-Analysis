@@ -2,17 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, Loader2 } from "lucide-react";
 import AudioInput from "@/components/AudioInput";
-import PatientInfoForm from "@/components/PatientInfoForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function AnalyzePage() {
   const navigate = useNavigate();
-  const [patientInfo, setPatientInfo] = useState({
-    name: "",
-    age: "",
-    gender: "",
-  });
   const [audioBlob, setAudioBlob] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -35,9 +29,7 @@ export default function AnalyzePage() {
     return () => clearInterval(interval);
   }, [isAnalyzing]);
 
-  const isFormValid = () => {
-    return patientInfo.age && patientInfo.gender && audioBlob;
-  };
+  const isFormValid = () => !!audioBlob;
 
   const handleAnalyze = async () => {
     if (!isFormValid()) {
@@ -49,13 +41,13 @@ export default function AnalyzePage() {
 
     try {
       const formData = new FormData();
-      formData.append("age", patientInfo.age);
-      formData.append("gender", patientInfo.gender);
-      if (patientInfo.name) {
-        formData.append("name", patientInfo.name);
-      }
 
-      const file = audioBlob instanceof File ? audioBlob : new File([audioBlob], "recording.wav", { type: audioBlob?.type || "audio/wav" });
+      const file =
+        audioBlob instanceof File
+          ? audioBlob
+          : new File([audioBlob], "recording.wav", {
+              type: audioBlob?.type || "audio/wav",
+            });
       formData.append("file", file, file.name || "recording.wav");
 
       const response = await fetch("http://127.0.0.1:4000/api/analysis/recommend", {
@@ -72,7 +64,6 @@ export default function AnalyzePage() {
       setProgress(100);
       navigate("/results", {
         state: {
-          patientInfo,
           analysisData: payload?.data ?? payload,
         },
       });
@@ -97,34 +88,17 @@ export default function AnalyzePage() {
             </span>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-300">
-            Complete the form below and provide audio input to get your health
-            analysis
+            Upload or record audio to get your respiratory analysis
           </p>
         </div>
 
         {/* Analysis Form */}
         <div className="max-w-4xl mx-auto space-y-6">
-          {/* Step 1: Patient Information */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-bold">
-                1
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Patient Information
-              </h2>
-            </div>
-            <PatientInfoForm
-              patientInfo={patientInfo}
-              onPatientInfoChange={setPatientInfo}
-            />
-          </div>
-
-          {/* Step 2: Audio Input */}
+          {/* Audio Input */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-cyan-500 flex items-center justify-center text-white font-bold">
-                2
+                1
               </div>
               <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 Audio Input
@@ -143,8 +117,8 @@ export default function AnalyzePage() {
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {isFormValid()
-                      ? "All information provided. Click analyze to get your results."
-                      : "Please complete all required fields before analyzing."}
+                      ? "Audio is ready. Click analyze to get your results."
+                      : "Please provide an audio sample before analyzing."}
                   </p>
                 </div>
                 <Button

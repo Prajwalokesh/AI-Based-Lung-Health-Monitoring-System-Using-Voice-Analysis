@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
@@ -41,15 +41,16 @@ MODEL = load_keras_model()
 CLASS_NAMES = [
     "Asthma",
     "Bronchiectasis",
-    "Bronchiolities",
+    "Bronchiolitis",
     "COPD",
     "Healthy",
     "LRTI",
+    "Pneumonia",
     "URTI",
 ]
 
 
-def preprocess_audio(file_bytes, sr_target=22050, n_mfcc=40):
+def preprocess_audio(file_bytes, sr_target=None, n_mfcc=40):
     """Preprocess audio to match training pipeline in the notebook.
 
     Steps:
@@ -72,9 +73,6 @@ def preprocess_audio(file_bytes, sr_target=22050, n_mfcc=40):
 
 @app.post("/predict-health")
 async def predict_health(
-    age: int = Form(...),
-    gender: str = Form(...),
-    name: str | None = Form(None),
     file: UploadFile = File(...),
 ):
     if MODEL is None:
@@ -115,9 +113,6 @@ async def predict_health(
         class_probabilities = {str(i): float(p) for i, p in enumerate(probs_list[0] if isinstance(probs_list[0], list) else probs_list)}
 
     response = {
-        "age": age,
-        "gender": gender,
-        "name": name,
         "prediction": {
             "predicted_index": predicted_index,
             "predicted_label": predicted_label,

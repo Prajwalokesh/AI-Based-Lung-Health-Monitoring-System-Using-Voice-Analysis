@@ -20,7 +20,7 @@ export async function getRecommendation(
   res: Response,
   next: NextFunction,
 ) {
-  const { success, data, error } = recommendationSchema.safeParse(req.body);
+  const { success, error } = recommendationSchema.safeParse(req.body);
 
   if (!success) {
     return sendError(
@@ -31,7 +31,6 @@ export async function getRecommendation(
     );
   }
 
-  const { age, gender, name } = data;
   const file = req.file;
 
   if (!file) {
@@ -48,12 +47,6 @@ export async function getRecommendation(
 
   try {
     const formData = new FormData();
-    formData.append("age", age.toString());
-    formData.append("gender", gender.toLowerCase());
-    if (name) {
-      formData.append("name", name);
-    }
-
     formData.append(
       "file",
       fsSync.createReadStream(`./src/uploads/${file.filename}`),
@@ -73,9 +66,6 @@ export async function getRecommendation(
         res,
         "Analysis completed successfully!",
         {
-          age,
-          gender: gender.toLowerCase(),
-          ...(name && { name }),
           result: response?.prediction ?? response,
         },
         200,
@@ -90,9 +80,6 @@ export async function getRecommendation(
     const analysisRecord = await Analysis.insertOne({
       userId: req.userId || "guest",
       audioFile: savedFile._id,
-      age,
-      gender: gender.toLowerCase(),
-      ...(name && { name }),
       result:
         response?.prediction?.predicted_label ??
         response?.prediction?.predictedLabel ??
@@ -102,9 +89,6 @@ export async function getRecommendation(
     });
 
     const responseData = {
-      age: analysisRecord.age,
-      gender: analysisRecord.gender,
-      ...(analysisRecord.name && { name: analysisRecord.name }),
       audioFile: {
         originalFileName: savedFile.originalFileName,
         fileEndpoint: savedFile.audioEndPoint,

@@ -3,9 +3,6 @@ import mongoose from "mongoose";
 export interface AnalysisBase {
   userId: string;
   audioFile: mongoose.Schema.Types.ObjectId;
-  age: number;
-  gender: string;
-  name?: string;
   result: string;
   createdAt: Date;
 }

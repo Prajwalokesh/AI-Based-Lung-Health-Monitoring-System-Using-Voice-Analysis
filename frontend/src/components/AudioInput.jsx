@@ -159,7 +159,7 @@ export default function AudioInput({ onAudioChange }) {
       <CardContent className="space-y-4">
         {!audioBlob ? (
           <>
-            {/* Recording Section */}
+            {/* Recording Section
             <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600">
               {!isRecording ? (
                 <>
@@ -191,10 +191,10 @@ export default function AudioInput({ onAudioChange }) {
                   </Button>
                 </>
               )}
-            </div>
+            </div> */}
 
             {/* Divider */}
-            <div className="relative">
+            {/* <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
               </div>
@@ -203,7 +203,7 @@ export default function AudioInput({ onAudioChange }) {
                   OR
                 </span>
               </div>
-            </div>
+            </div> */}
 
             {/* Upload Section */}
             <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600">
